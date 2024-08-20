@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Segurança da Informação</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Electrolize&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+        body {
+            font-family: 'Electrolize', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            background: #2e2e2e;
+            color: #e0f2f1;
+        }
+
+        .header-container {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #000000;
+            color: #e0f2f1;
+        }
+
+        .left-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .welcome-message {
+            font-size: 20px;
+            text-align: left;
+        }
+
+        .left-image {
+            width: 225px;
+            height: 125px;
+            background: url('heroi.gif') no-repeat center center;
+            background-size: contain;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .main-container {
+            display: flex;
+            padding: 10px;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .options {
+            width: 60%;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-wrap: wrap;
+            margin: 10px;
+            gap: 10px;
+        }
+
+        .options button {
+            background-color: #00796b;
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            text-align: center;
+            box-shadow: 0 0px 20px rgba(0, 0, 0, 0.3);
+            flex: 1 1 calc(33.333% - 20px);
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .options button.selected {
+            background-color: #004d40;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .checkbox-container {
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+        margin-left: 10px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+            cursor: pointer;
+            width: 0;
+            height: 0;
+        }
+
+        .checkbox-mark {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00796b;
+            border-radius: 4px;
+            background-color: #2e2e2e;
+            display: inline-block;
+            position: relative;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .checkbox-container input:checked ~ .checkbox-mark {
+            background-color: #00796b;
+            border-color: #00796b;
+        }
+
+        .checkbox-mark::after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        .checkbox-container input:checked ~ .checkbox-mark::after {
+            display: block;
+            left: 7px;
+            top: 3px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 3px 3px 0;
+            transform: rotate(45deg);
+        }
+
+
+        .info {
+            width: 40%;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            overflow-wrap: break-word;
+            font-size: 20px;
+        }
+
+        #counter {
+            font-size: 24px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .left-section {
+                align-items: flex-start;
+            }
+
+            .welcome-message {
+                max-width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .left-image {
+                width: 80px;
+                height: 80px;
+            }
+
+            .main-container {
+                flex-direction: column;
+            }
+
+            .options {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .info {
+                width: 100%;
+            }
+
+            .options button {
+                flex: 1 1 calc(50% - 20px);
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="left-section">
+            <div class="left-image"></div>
+        </div>
+        <div id="preview-box" style="display:none; position:absolute; background-color:rgba(0, 0, 0, 0.8); padding:10px; border-radius:10px; color:#e0f2f1; font-size:16px; max-width:300px; z-index:1000;">
+        </div>
+        
+        <div class="welcome-message">
+            Olá, Aprendiz de Herói!<br><br>
+            Alguns heróis estão aqui para te ajudar a virar um Super-Herói da Segurança da Informação!<br><br>
+            Selecione uma das opções abaixo para ficar um pouco mais perto do seu objetivo.
+        </div>
+    </div>
+    <div class="main-container">
+        <div class="options">
+            <button onmouseover="previewQuestion(event, 'Segredo de Espião')" onmouseout="hidePreview()" onclick="toggleCheckbox(this, 'Segredo de Espião')">
+                Segredo de Espião
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-mark"></span>
+                </div>
+            </button>
+            <button onmouseover="previewQuestion(event, 'Caixa-Forte Digital')" onmouseout="hidePreview()" onclick="toggleCheckbox(this, 'Caixa-Forte Digital')">
+                Caixa-Forte Digital
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-mark"></span>
+                </div>
+            </button>
+            <button onmouseover="previewQuestion(event, 'Capa Invisível')" onmouseout="hidePreview()" onclick="toggleCheckbox(this, 'Capa Invisível')">
+                Capa Invisível
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-mark"></span>
+                </div>
+            </button>
+            <button onmouseover="previewQuestion(event, 'Fortaleza da Solidão')" onmouseout="hidePreview()" onclick="toggleCheckbox(this, 'Fortaleza da Solidão')">
+                Fortaleza da Solidão
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-mark"></span>
+                </div>
+            </button>
+            <button onmouseover="previewQuestion(event, 'Martelo do Thor')" onmouseout="hidePreview()" onclick="toggleCheckbox(this, 'Martelo do Thor')">
+                Martelo do Thor
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-mark"></span>
+                </div>
+            </button>
+            <button onmouseover="previewQuestion(event, 'Olho de Agamotto')" onmouseout="hidePreview()" onclick="toggleCheckbox(this, 'Olho de Agamotto')">
+                Olho de Agamotto
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-mark"></span>
+                </div>
+            </button>
+            <button onmouseover="previewQuestion(event, 'Escudo do Capitão América')" onmouseout="hidePreview()" onclick="toggleCheckbox(this, 'Escudo do Capitão América')">
+                Escudo do Capitão América
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-mark"></span>
+                </div>
+            </button>
+            <button onmouseover="previewQuestion(event, 'Lanterna Verde')" onmouseout="hidePreview()" onclick="toggleCheckbox(this, 'Lanterna Verde')">
+                Lanterna Verde
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-mark"></span>
+                </div>
+            </button>
+            <button onmouseover="previewQuestion(event, 'Jarvis do Homem de Ferro')" onmouseout="hidePreview()" onclick="toggleCheckbox(this, 'Jarvis do Homem de Ferro')">
+                Jarvis do Homem de Ferro
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-mark"></span>
+                </div>
+            </button>
+            <button onmouseover="previewQuestion(event, 'Verdadeira Face do Homem-Aranha')" onmouseout="hidePreview()" onclick="toggleCheckbox(this, 'Verdadeira Face do Homem-Aranha')">
+                Verdadeira Face do Homem-Aranha
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-mark"></span>
+                </div>
+            </button>
+            <button onmouseover="previewQuestion(event, 'O Olho de Falcão')" onmouseout="hidePreview()" onclick="toggleCheckbox(this, 'O Olho de Falcão')">
+                O Olho de Falcão
+                <div class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkbox-mark"></span>
+                </div>
+            </button>
+        </div>
+        <div id="info" class="info">
+            Selecione uma opção ao lado para ver a pergunta e a resposta.
+        </div>
+    </div>
+
+    <div id="counter">Opções selecionadas: 0/11</div>
+
+    <script>
+        const infoData = {
+            "Segredo de Espião": { pergunta: "O que é criptografia?", resposta: "Criptografia é como ter um segredo que só você e seu amigo sabem. Quando você escreve algo em código, só quem tem a chave pode ler. Assim, suas mensagens são protegidas e ninguém pode entender a menos que saiba o segredo." },
+            "Caixa-Forte Digital": { pergunta: "Como você pode proteger suas senhas?", resposta: "Usar senhas fortes e um gerenciador de senhas é como ter uma Caixa-Forte Digital! Imagine que suas senhas são joias preciosas. Você as guarda em um cofre tão seguro que só você tem a chave. Assim, mesmo que alguém tente invadir, não conseguirá acessar suas informações." },
+            "Capa Invisível": { pergunta: "O que é privacidade e como você pode mantê-la?", resposta: "Privacidade é como ter uma Capa Invisível! Você pode navegar na internet sem que ninguém veja o que você está fazendo. Isso significa usar ferramentas que protejam seus dados pessoais, como VPNs e modos de navegação privada." },
+            "Fortaleza da Solidão": { pergunta: "O que é segurança de rede?", resposta: "Segurança de rede é como a Fortaleza da Solidão do Superman! É o lugar onde você pode trabalhar sem medo de ataques. Isso inclui usar firewalls, criptografia e outras ferramentas para manter os vilões cibernéticos fora da sua rede." },
+            "Martelo do Thor": { pergunta: "Como proteger seus dispositivos de malware?", resposta: "Proteger seus dispositivos de malware é como ter o Martelo do Thor! Com ele, você pode esmagar qualquer ameaça que tente invadir seu computador ou smartphone. Isso inclui usar antivírus, manter seu sistema atualizado e ser cauteloso com downloads." },
+            "Olho de Agamotto": { pergunta: "O que é autenticação multifator (MFA)?", resposta: "Autenticação multifator é como o Olho de Agamotto do Doutor Estranho! Ele adiciona uma camada extra de proteção, garantindo que apenas pessoas autorizadas possam acessar suas contas. Com MFA, mesmo que alguém tenha sua senha, precisará de algo mais para entrar." },
+            "Escudo do Capitão América": { pergunta: "Como proteger seus dados durante transações online?", resposta: "Proteger seus dados em transações online é como usar o Escudo do Capitão América! Você cria uma barreira que impede que informações sensíveis sejam interceptadas. Use sites seguros (HTTPS) e evite redes Wi-Fi públicas ao realizar pagamentos." },
+            "Lanterna Verde": { pergunta: "Como reconhecer um e-mail de phishing?", resposta: "Reconhecer um e-mail de phishing é como ter o Anel do Lanterna Verde! Ele permite que você veja além das aparências. E-mails de phishing tentam enganá-lo se passando por mensagens legítimas. Verifique sempre o remetente e desconfie de links suspeitos." },
+            "Jarvis do Homem de Ferro": { pergunta: "Como a inteligência artificial pode ajudar na segurança?", resposta: "A inteligência artificial na segurança é como ter o Jarvis do Homem de Ferro! Ela pode analisar padrões, identificar ameaças e responder rapidamente a incidentes. É como ter um assistente superinteligente protegendo seus sistemas 24/7." },
+            "Verdadeira Face do Homem-Aranha": { pergunta: "Por que é importante verificar a identidade das pessoas?", resposta: "Verificar a identidade é como conhecer a verdadeira face do Homem-Aranha! Você precisa ter certeza de quem está do outro lado antes de confiar. Isso evita fraudes e garante que só pessoas autorizadas tenham acesso às informações." },
+            "O Olho de Falcão": { pergunta: "Como monitorar a segurança dos seus sistemas?", resposta: "Monitorar a segurança dos seus sistemas é como ter o Olho de Falcão! Você consegue ver qualquer ameaça que se aproxima, mesmo de longe. Ferramentas de monitoramento ajudam a identificar atividades suspeitas e a responder rapidamente." },
+        };
+
+        function previewQuestion(event, key) {
+        const previewBox = document.getElementById("preview-box");
+        const question = infoData[key].pergunta;
+        previewBox.innerHTML = `<strong>Pergunta:</strong> ${question}`;
+        previewBox.style.display = "block";
+        
+        // Posicionar o preview box próximo ao cursor
+        previewBox.style.left = `${event.pageX + 10}px`;
+        previewBox.style.top = `${event.pageY + 10}px`;
+        }
+
+        function hidePreview() {
+        const previewBox = document.getElementById("preview-box");
+        previewBox.style.display = "none";
+        }
+
+        function toggleCheckbox(button, key) {
+            const checkbox = button.querySelector("input[type='checkbox']");
+            if (!checkbox.checked) {
+                checkbox.checked = true;
+                button.classList.add("selected");
+                showAnswer(key);
+                updateCounter();
+            } else {
+                showAnswer(key); // Show answer even if checkbox is already checked
+            }
+        }
+
+        function showAnswer(key) {
+        const info = document.getElementById("info");
+        const question = infoData[key].pergunta;
+        const answer = infoData[key].resposta;
+        info.innerHTML = `<strong>${key}</strong><br><br><strong>Pergunta:</strong> ${question}<br><br><strong>Resposta:</strong> ${answer}`;
+        }
+
+
+        function updateCounter() {
+            const counter = document.getElementById("counter");
+            const selectedButtons = document.querySelectorAll(".options button.selected").length;
+            counter.textContent = `Opções selecionadas: ${selectedButtons}/11`;
+
+            if (selectedButtons === 11) {
+                counter.innerHTML = `<span style="color: yellow; font-size: 36px;">Parabéns, Você se tornou um Herói de Segurança da Informação!</span>`;
+            }
+        }
+    </script>
+</body>
+</html>
